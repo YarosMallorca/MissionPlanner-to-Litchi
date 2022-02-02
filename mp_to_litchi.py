@@ -3,7 +3,12 @@ import os
 
 print("WELCOME TO MISSION PLANNER TO LITCHI CONVERTER!\n")
 
-file = open(input("Path to Mission Planner (.waypoints) file: "), "r").read()
+filename = input("Path to Mission Planner (.waypoints) file: ")
+
+if not filename.endswith(".waypoints"):
+    filename += ".waypoints"
+
+file = open(filename, "r").read()
 file = str(file.split("\t"))
 file = file.replace("\\n", "', '")
 file = file.replace("'", "")
@@ -39,4 +44,3 @@ output_file.write(output_string)
 output_file.close()
 
 input("\nFile saved on your desktop with name Converted Litchi Mission.csv!\nPress ENTER to exit!")
-
