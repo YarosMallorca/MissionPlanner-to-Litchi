@@ -5,6 +5,9 @@ print("WELCOME TO MISSION PLANNER TO LITCHI CONVERTER!\n")
 
 filename = input("Path to Mission Planner (.waypoints) file: ")
 
+while not os.path.exists(filename):
+    filename = input("\nCouldn't find path to Mission Planner file, please try again: ")
+
 if not filename.endswith(".waypoints"):
     filename += ".waypoints"
 
