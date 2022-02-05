@@ -5,7 +5,7 @@ Litchi doesn't support Survey mode yet, but here is a workaround! You will need 
 
 Warning: This script is still under development, testing will be conducted soon, use it at your own risk. I'm not responsible for any damage of your drones.
 
-<a href="https://github.com/YarostheLaunchpadder/MissionPlanner-to-Litchi/releases/download/Alpha/Mission.Planner.to.Litchi.exes">Click here to Download for Windows</a>
+<a href="https://github.com/YarostheLaunchpadder/MissionPlanner-to-Litchi/releases/download/Alpha/Mission.Planner.to.Litchi.exe">Click here to Download for Windows</a>
 
 Mac version not available
 
