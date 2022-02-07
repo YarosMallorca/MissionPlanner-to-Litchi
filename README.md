@@ -3,7 +3,7 @@
 
 Litchi doesn't support Survey mode yet, but here is a workaround! You will need <a href=https://ardupilot.org/planner/docs/mission-planner-installation.html>Mission Planner</a> installed in order to plan your mission.
 
-Warning: This script is still under development, testing will be conducted soon, use it at your own risk. I'm not responsible for any damage of your drones.
+Warning: This script was tested successfully 3 times, should work pretty stable. I'm not responsible for any damage of your drones.
 
 <a href="https://github.com/YarostheLaunchpadder/MissionPlanner-to-Litchi/releases/download/Alpha/Mission.Planner.to.Litchi.exe">Click here to Download for Windows</a>
 
