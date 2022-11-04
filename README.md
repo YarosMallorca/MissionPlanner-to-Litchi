@@ -60,11 +60,11 @@ Mac version not available yet
 
 12. Open the script and select the files that you want to convert
 
-<img src="https://github.com/YarostheLaunchpadder/MissionPlanner-to-Litchi/blob/main/Screenshots/mp2litchi_gui_main.jpg?raw=true" height="100">
-
-<img src="https://github.com/YarostheLaunchpadder/MissionPlanner-to-Litchi/blob/main/Screenshots/mp2litchi_gui_select.jpg?raw=true" height="100">
+<img src="https://github.com/YarostheLaunchpadder/MissionPlanner-to-Litchi/blob/main/Screenshots/mp2litchi_gui_main.jpg?raw=true" height="250">
 
 13. The converted file (.csv) should be saved on your Desktop. Click <b>Enter</b> to exit the script.
+
+<img src="https://github.com/YarostheLaunchpadder/MissionPlanner-to-Litchi/blob/main/Screenshots/mp2litchi_gui_select.jpg?raw=true" height="250">
 
 14. Go to Litchi Mission Settings and make sure that the selected in red settings (in the screenshot below) are set to desired values. Path Mode must be set to Straight Lines, otherwise the Auto-Photo mode will not work!
 
