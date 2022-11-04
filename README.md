@@ -58,13 +58,13 @@ Mac version not available yet
 
 <img src="https://github.com/YarostheLaunchpadder/MissionPlanner-to-Litchi/blob/main/Screenshots/11.jpg?raw=true" height="200">
 
-12. Open the script and type the name of the mission file (ending with .waypoints) then press <b>Enter</b>
+12. Open the script and select the files that you want to convert
 
-<img src="https://github.com/YarostheLaunchpadder/MissionPlanner-to-Litchi/blob/main/Screenshots/12.jpg?raw=true" height="100">
+<img src="https://github.com/YarostheLaunchpadder/MissionPlanner-to-Litchi/blob/main/Screenshots/mp2litchi_gui_main.jpg?raw=true" height="100">
+
+<img src="https://github.com/YarostheLaunchpadder/MissionPlanner-to-Litchi/blob/main/Screenshots/mp2litchi_gui_select.jpg?raw=true" height="100">
 
 13. The converted file (.csv) should be saved on your Desktop. Click <b>Enter</b> to exit the script.
-
-<img src="https://github.com/YarostheLaunchpadder/MissionPlanner-to-Litchi/blob/main/Screenshots/13.jpg?raw=true" height="150">
 
 14. Go to Litchi Mission Settings and make sure that the selected in red settings (in the screenshot below) are set to desired values. Path Mode must be set to Straight Lines, otherwise the Auto-Photo mode will not work!
 
