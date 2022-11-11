@@ -51,11 +51,11 @@ def convert(filename: str):
     for row in waypoint_list:
         try:
             output_string = output_string + row[8] + "," + row[9] + "," + str(int(float(row[
-                                                                                            10]))) + ",0,0,0,0,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,0,0,0,0,0,0,-1," + str(
+                                                                                            10]))) + ",0,0,0,0,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,1,0,0,0,0,0,-1," + str(
                 round(float(file_list[file_list.index(row) + 1][4]), 3)) + "\n"
         except:
             output_string = output_string + row[8] + "," + row[9] + "," + str(int(float(row[
-                                                                                            10]))) + ",0,0,0,0,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,0,0,0,0,0,0,-1,-1,-1"
+                                                                                            10]))) + ",0,0,0,0,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,-1,0,0,1,0,0,0,0,-1,-1,-1"
     with open(f"{filename}.csv", "w") as output_file:
         output_file.write(output_string)
         output_file.close()
