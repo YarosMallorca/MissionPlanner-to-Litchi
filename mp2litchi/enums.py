@@ -4,7 +4,7 @@ Module to bundle all enum classes
 from enum import Enum
 
 
-class MPCommands(Enum):
+class MPCommand(Enum):
     """
     Enum class for the command ids of mission planner waypoint export files
     """

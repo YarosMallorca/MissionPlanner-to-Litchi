@@ -3,10 +3,11 @@ Mission Planner to Litchi Converter by https://github.com/YarostheLaunchpadder
 """
 import os
 
-from litchi_wp.waypoint import Waypoint
 from litchi_wp.enums import AltitudeMode
+from litchi_wp.waypoint import Waypoint
 
-from mp2litchi.enums import MPCommands
+from mp2litchi.enums import MPCommand
+from mp2litchi.global_mp_cmd import GlobalMPCmdManager
 
 
 def welcome():
@@ -41,12 +42,12 @@ def parse_file(filename: str) -> list[list[str]]:
     return file_lists
 
 
-def get_cmd(lst: list[str]) -> MPCommands | None:
+def get_cmd(lst: list[str]) -> MPCommand | None:
     """
     Extracts the command from a mp waypoint line
     """
     try:
-        return MPCommands(
+        return MPCommand(
             int(float(
                 lst[3]
             ))
@@ -64,18 +65,19 @@ def convert(filename: str, set_agl=True):
     while not os.path.exists(filename):
         filename = input("\nCouldn't find path to Mission Planner file, please try again: ")
 
-    cmd_receivers = [MPCommands.WAYPOINT]  # mp commands that can be referenced by action commands
+    receiver_cmds = [MPCommand.WAYPOINT]  # mp commands that can be referenced by action commands
     file_list = parse_file(filename)
+    globalCmdManager = GlobalMPCmdManager()
     waypoint_list = []
     temp_wp: Waypoint | None = None
     after_takeoff = False
 
     for row in file_list:
         if not after_takeoff:
-            if get_cmd(row) is MPCommands.TAKEOFF:  # ignore anything before takeoff
+            if get_cmd(row) is MPCommand.TAKEOFF:  # ignore anything before takeoff
                 after_takeoff = True
             continue
-        if get_cmd(row) in cmd_receivers:
+        if get_cmd(row) in receiver_cmds:
             if temp_wp is not None:
                 waypoint_list.append(temp_wp)  # store waypoint
             latitude = float(row[8])  # latitude is at location 8
@@ -84,16 +86,18 @@ def convert(filename: str, set_agl=True):
             altitude_mode = AltitudeMode.AGL if set_agl else AltitudeMode.MSL
             temp_wp = Waypoint(lat=latitude, lon=longitude, alt=altitude)  # create new waypoint
             temp_wp.set_altitude(value=altitude, mode=altitude_mode)  # set the altitude mode
-        elif temp_wp is not None:
-            match get_cmd(row):
-                case MPCommands.DO_SET_CAM_TRIG_DISTANCE:
-                    temp_wp.set_photo_interval_distance(
-                        round(float(row[4]), 1)
-                    )
-                case MPCommands.DO_CHANGE_SPEED:
-                    temp_wp.set_speed_ms(
-                        round(float(row[5]), 2)
-                    )
+            globalCmdManager.apply_all_active_to_waypoint(waypoint=temp_wp)  # apply all active global commands to wp
+        else:  # not a command receiver. Be careful temp_wp might be None
+            command = get_cmd(row)
+            global_cmd = globalCmdManager.is_global(command)
+            if global_cmd:
+                param = float(row[global_cmd.param_loc])
+                globalCmdManager.update(command, param)
+                if temp_wp:
+                    globalCmdManager.apply_to_waypoint(global_cmd, waypoint=temp_wp)
+            else:
+                # handle all non-global commands
+                pass
         if file_list.index(row) == len(file_list) - 1:  # is last row
             waypoint_list.append(temp_wp)  # store waypoint
             temp_wp = None
