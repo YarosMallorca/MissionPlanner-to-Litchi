@@ -56,6 +56,8 @@ def get_cmd(lst: list[str]) -> MPCommand | None:
         return None
 
 
+# pylint: disable=too-many-locals,too-many-branches
+# (better split function so pylint is happy)
 def convert(filename: str, set_agl=True):
     """
     Converts a single file
@@ -67,16 +69,18 @@ def convert(filename: str, set_agl=True):
 
     receiver_cmds = [MPCommand.WAYPOINT]  # mp commands that can be referenced by action commands
     file_list = parse_file(filename)
-    globalCmdManager = GlobalMPCmdManager()
-    waypoint_list = []
+    global_cmd_manager = GlobalMPCmdManager()
+    waypoint_list: list[Waypoint] = []
     temp_wp: Waypoint | None = None
-    after_takeoff = False
 
     for row in file_list:
-        if not after_takeoff:
-            if get_cmd(row) is MPCommand.TAKEOFF:  # ignore anything before takeoff
-                after_takeoff = True
+        if len(row) != 12:  # skip invalid lines
+            # (better use regex https://www.w3schools.com/python/python_regex.asp)
             continue
+        if row[1] == '1':  # skip home location
+            continue
+        if get_cmd(row) is MPCommand.TAKEOFF:  # ignore any waypoints before takeoff
+            waypoint_list.clear()
         if get_cmd(row) in receiver_cmds:
             if temp_wp is not None:
                 waypoint_list.append(temp_wp)  # store waypoint
@@ -86,15 +90,19 @@ def convert(filename: str, set_agl=True):
             altitude_mode = AltitudeMode.AGL if set_agl else AltitudeMode.MSL
             temp_wp = Waypoint(lat=latitude, lon=longitude, alt=altitude)  # create new waypoint
             temp_wp.set_altitude(value=altitude, mode=altitude_mode)  # set the altitude mode
-            globalCmdManager.apply_all_active_to_waypoint(waypoint=temp_wp)  # apply all active global commands to wp
+            global_cmd_manager.apply_all_active_to_waypoint(
+                waypoint=temp_wp
+            )  # apply all active global commands to wp
         else:  # not a command receiver. Be careful temp_wp might be None
             command = get_cmd(row)
-            global_cmd = globalCmdManager.is_global(command)
+            if command is None:  # skip invalid commands
+                continue
+            global_cmd = global_cmd_manager.is_global(command)
             if global_cmd:
                 param = float(row[global_cmd.param_loc])
-                globalCmdManager.update(command, param)
+                global_cmd_manager.update(command, param)
                 if temp_wp:
-                    globalCmdManager.apply_to_waypoint(global_cmd, waypoint=temp_wp)
+                    global_cmd_manager.apply_to_waypoint(global_cmd, waypoint=temp_wp)
             else:
                 # handle all non-global commands
                 pass
