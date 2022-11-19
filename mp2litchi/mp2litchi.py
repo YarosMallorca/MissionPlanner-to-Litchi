@@ -3,7 +3,7 @@ Mission Planner to Litchi Converter by https://github.com/YarostheLaunchpadder
 """
 import os
 
-from litchi_wp.enums import AltitudeMode
+from litchi_wp.enums import AltitudeMode, ActionType
 from litchi_wp.waypoint import Waypoint
 
 from mp2litchi.enums import MPCommand
@@ -56,7 +56,36 @@ def get_cmd(lst: list[str]) -> MPCommand | None:
         return None
 
 
-# pylint: disable=too-many-locals,too-many-branches
+def get_delay(line: list[str]) -> float:
+    """
+    Extracts the delay from a waypoint
+
+    Args:
+        line (list[str]): The Line to be parsed
+
+    Returns:
+        The delay in seconds (float)
+    """
+    return float(line[4])
+
+
+def check_valid_line(line: list[str]) -> bool:
+    """
+    Checks if the line is valid
+    (better use regexp https://www.w3schools.com/python/python_regex.asp))
+
+    Args:
+        line (list[str]): The line to be checked
+
+    Returns:
+        True if line passed the checks
+    """
+    if len(line) != 12:  # invalid lines
+        return False
+    return True
+
+
+# pylint: disable=too-many-locals,too-many-branches,too-many-statements
 # (better split function so pylint is happy)
 def convert(filename: str, set_agl=True):
     """
@@ -74,8 +103,7 @@ def convert(filename: str, set_agl=True):
     temp_wp: Waypoint | None = None
 
     for row in file_list:
-        if len(row) != 12:  # skip invalid lines
-            # (better use regex https://www.w3schools.com/python/python_regex.asp)
+        if not check_valid_line(row):  # skip invalid lines
             continue
         if row[1] == '1':  # skip home location
             continue
@@ -85,12 +113,21 @@ def convert(filename: str, set_agl=True):
         if get_cmd(row) in receiver_cmds:
             if temp_wp is not None:
                 waypoint_list.append(temp_wp)  # store waypoint
+            action_index = 0
             latitude = float(row[8])  # latitude is at location 8
             longitude = float(row[9])  # longitude  is at location 9
             altitude = float(row[10])  # altitude  is at location 10
             altitude_mode = AltitudeMode.AGL if set_agl else AltitudeMode.MSL
             temp_wp = Waypoint(lat=latitude, lon=longitude, alt=altitude)  # create new waypoint
             temp_wp.set_altitude(value=altitude, mode=altitude_mode)  # set the altitude mode
+            stay_for = get_delay(row)
+            if stay_for > 0:  # is delay is set for waypoint
+                temp_wp.set_action(  # set stay_for
+                    index=action_index,
+                    actiontype=ActionType.STAY_FOR,
+                    param=int(stay_for*1000)
+                )
+                action_index += 1
             global_cmd_manager.apply_all_active_to_waypoint(
                 waypoint=temp_wp
             )  # apply all active global commands to wp
@@ -106,7 +143,15 @@ def convert(filename: str, set_agl=True):
                     global_cmd_manager.apply_to_waypoint(global_cmd, waypoint=temp_wp)
             else:
                 # handle all non-global commands
-                pass
+                match command:
+                    case MPCommand.DO_DIGICAM_CONTROL:
+                        if temp_wp:
+                            temp_wp.set_action(
+                                index=action_index,
+                                actiontype=ActionType.TAKE_PHOTO,
+                            )
+                            action_index += 1
+
         if file_list.index(row) == len(file_list) - 1:  # is last row
             waypoint_list.append(temp_wp)  # store waypoint
             temp_wp = None
