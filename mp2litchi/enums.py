@@ -65,3 +65,5 @@ class ErrorMessage(Enum):
     """
 
     FILE_NOT_FOUND = 'The file was not found.'
+    NO_FREE_ACTION_SLOTS = 'The waypoint has no more free action slots. ' \
+                           'Maximum is 15 actions per Waypoint.'

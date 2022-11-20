@@ -135,7 +135,6 @@ def convert(filename: str, set_agl=True) -> Tuple[list[str], list[str], list[str
         if get_cmd(row) in receiver_cmds:
             if temp_wp is not None:
                 waypoint_list.append(temp_wp)  # store waypoint
-            action_index = 0
             latitude = float(row[8])  # latitude is at location 8
             longitude = float(row[9])  # longitude  is at location 9
             altitude = float(row[10])  # altitude  is at location 10
@@ -144,12 +143,11 @@ def convert(filename: str, set_agl=True) -> Tuple[list[str], list[str], list[str
             temp_wp.set_altitude(value=altitude, mode=altitude_mode)  # set the altitude mode
             stay_for = get_delay(row)
             if stay_for > 0:  # is delay is set for waypoint
-                temp_wp.set_action(  # set stay_for
-                    index=action_index,
-                    actiontype=ActionType.STAY_FOR,
-                    param=int(stay_for * 1000)
-                )
-                action_index += 1
+                if not temp_wp.set_action(
+                        action_type=ActionType.STAY_FOR,
+                        param=int(stay_for * 1000)
+                ):  # waypoint has no free action slot left
+                    errors.append(ErrorMessage.NO_FREE_ACTION_SLOTS.value)
             global_cmd_manager.apply_all_active_to_waypoint(
                 waypoint=temp_wp
             )  # apply all active global commands to wp
@@ -180,11 +178,13 @@ def convert(filename: str, set_agl=True) -> Tuple[list[str], list[str], list[str
                 match command:
                     case MPCommand.DO_DIGICAM_CONTROL:
                         if temp_wp:
-                            temp_wp.set_action(
-                                index=action_index,
-                                actiontype=ActionType.TAKE_PHOTO,
-                            )
-                            action_index += 1
+                            if not temp_wp.set_action(
+                                    action_type=ActionType.TAKE_PHOTO,
+                            ):  # waypoint has no free action slot left
+                                errors.append(
+                                    f"Line {file_list.index(row)}: "
+                                    f"{ErrorMessage.NO_FREE_ACTION_SLOTS.value}"
+                                )
 
         if file_list.index(row) == len(file_list) - 1:  # is last row
             waypoint_list.append(temp_wp)  # store waypoint
