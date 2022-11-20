@@ -8,6 +8,7 @@ class MPCommand(Enum):
     """
     Enum class for the command ids of mission planner waypoint export files
     """
+
     WAYPOINT = 16
     SPLINE_WAYPOINT = 82
     LOITER_TURNS = 18
@@ -39,3 +40,27 @@ class MPCommand(Enum):
     DO_DIGICAM_CONTROL = 203
     DO_MOUNT_CONTROL = 205
     DO_SPRAYER = 216
+
+
+class InfoMessage(Enum):
+    """
+    Enum class for info messages to be shows in the gui or log
+    """
+
+
+class WarningMessage(Enum):
+    """
+    Enum class for warning messages to be shows in the gui or log
+    """
+
+    SPEED_CAP = 'The speed has been set to 15m/s due to Litchi limitations.'
+    SPEED_NEGATIVE = 'The speed has been set to cruise speed ' \
+                     '(see Litchi settings) because negative speed is not allowed.'
+
+
+class ErrorMessage(Enum):
+    """
+    Enum class for error messages to be shows in the gui or log
+    """
+
+    FILE_NOT_FOUND = 'The file was not found.'

@@ -6,6 +6,7 @@ from litchi_wp.waypoint import Waypoint
 from mp2litchi.enums import MPCommand
 
 
+# pylint: disable=too-few-public-methods
 class GlobalMPCmd:
     """
     Represents a single MP cmd
@@ -19,7 +20,9 @@ class GlobalMPCmd:
             cmd (MPCommand): The MP command
             param (int | float): The parameter of the command
             active (bool): True if global command is active
+
         """
+
         self.active: bool = active
         self.type: MPCommand = cmd
         self.param: int | float = param
@@ -34,6 +37,7 @@ class GlobalMPCmdManager:
         global_cmds (list[GlobalMPCmd]): List of commands that influence all following waypoints
 
     """
+
     global_cmds = [
         GlobalMPCmd(cmd=MPCommand.DO_CHANGE_SPEED, loc=5),
         GlobalMPCmd(cmd=MPCommand.DO_SET_CAM_TRIG_DISTANCE, loc=4)
@@ -45,10 +49,20 @@ class GlobalMPCmdManager:
 
         Returns:
             A list of GlobalMPCmd objects that are currently set to active
+
         """
+
         return [cmd for cmd in self.global_cmds if cmd.active]
 
     def apply_to_waypoint(self, cmd: GlobalMPCmd, waypoint: Waypoint):
+        """
+        Applies the global command to the waypoint
+        Args:
+            cmd: The command to be applied
+            waypoint: The waypoint to be referenced
+
+        """
+
         match cmd.type:
             case MPCommand.DO_SET_CAM_TRIG_DISTANCE:
                 waypoint.set_photo_interval_distance(
@@ -60,6 +74,13 @@ class GlobalMPCmdManager:
                 )
 
     def apply_all_active_to_waypoint(self, waypoint: Waypoint):
+        """
+        Applies all active global commands to the Waypoint
+        Args:
+            waypoint: The waypoint to be referenced
+
+        """
+
         cmds = self.get_active()
         for cmd in cmds:
             self.apply_to_waypoint(cmd, waypoint)
@@ -75,6 +96,7 @@ class GlobalMPCmdManager:
             The command as GlobalMPCmd or None
 
         """
+
         for g_cmd in self.global_cmds:
             if g_cmd.type == cmd:
                 return g_cmd
@@ -82,7 +104,8 @@ class GlobalMPCmdManager:
 
     def update(self, cmd: MPCommand, param: float | int) -> bool:
         """
-        Checks if a given command has global effects. If that is the case the global command gets updated.
+        Checks if a given command has global effects.
+        If that is the case the global command gets updated.
 
         Args:
             cmd: The MP command
@@ -92,8 +115,10 @@ class GlobalMPCmdManager:
             True if the command has global effects and was updated
 
         """
+
         for g_cmd in self.global_cmds:
             if g_cmd.type == cmd:
                 g_cmd.param = param
                 g_cmd.active = True
                 return True
+        return False

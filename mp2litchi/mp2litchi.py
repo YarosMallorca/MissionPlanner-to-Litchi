@@ -2,11 +2,12 @@
 Mission Planner to Litchi Converter by https://github.com/YarostheLaunchpadder
 """
 import os
+from typing import Tuple
 
 from litchi_wp.enums import AltitudeMode, ActionType
 from litchi_wp.waypoint import Waypoint
 
-from mp2litchi.enums import MPCommand
+from mp2litchi.enums import MPCommand, WarningMessage, ErrorMessage
 from mp2litchi.global_mp_cmd import GlobalMPCmdManager
 
 
@@ -14,16 +15,22 @@ def welcome():
     """
     Welcome messages
     """
+
     print("WELCOME TO MISSION PLANNER TO LITCHI CONVERTER!\n")
     print("Converted files will be saved to the same directory the source file is in.\n")
 
 
 def parse_file(filename: str) -> list[list[str]]:
     """
-    Reads File and converts it to a list of single values
-    @param filename: The path to the file. e.g.: /home/user/any/file.waypoints
-    @return: A List with sublists each containing the values of each line extracted from the file
+
+    Args:
+        filename (str): The path to the file. e.g.: /home/user/any/file.waypoints
+
+    Returns:
+        A List with sublists each containing the values of each line extracted from the file
+
     """
+
     if not filename.endswith(".waypoints"):
         filename += ".waypoints"
 
@@ -46,6 +53,7 @@ def get_cmd(lst: list[str]) -> MPCommand | None:
     """
     Extracts the command from a mp waypoint line
     """
+
     try:
         return MPCommand(
             int(float(
@@ -65,7 +73,9 @@ def get_delay(line: list[str]) -> float:
 
     Returns:
         The delay in seconds (float)
+
     """
+
     return float(line[4])
 
 
@@ -79,7 +89,9 @@ def check_valid_line(line: list[str]) -> bool:
 
     Returns:
         True if line passed the checks
+
     """
+
     if len(line) != 12:  # invalid lines
         return False
     return True
@@ -87,14 +99,23 @@ def check_valid_line(line: list[str]) -> bool:
 
 # pylint: disable=too-many-locals,too-many-branches,too-many-statements
 # (better split function so pylint is happy)
-def convert(filename: str, set_agl=True):
+def convert(filename: str, set_agl=True) -> Tuple[list[str], list[str], list[str]]:
     """
     Converts a single file
-    :param filename: The path to the file. e.g.: /home/user/any/file.waypoints
-    :param set_agl: Sets the AGL flag of the waypoints if True
+    Args:
+        filename (str): The path to the file. e.g.: /home/user/any/file.waypoints
+        set_agl (bool): Sets the AGL flag of the waypoints if True
+
+    Returns:
+        A tuple of (info, warning, error) messages
+
     """
-    while not os.path.exists(filename):
-        filename = input("\nCouldn't find path to Mission Planner file, please try again: ")
+
+    infos: list[str] = []  # List of info messages
+    warnings: list[str] = []  # List of warning messages
+    errors: list[str] = []  # List of error messages
+    if not os.path.exists(filename):
+        errors.append(ErrorMessage.FILE_NOT_FOUND.value)
 
     receiver_cmds = [MPCommand.WAYPOINT]  # mp commands that can be referenced by action commands
     file_list = parse_file(filename)
@@ -125,7 +146,7 @@ def convert(filename: str, set_agl=True):
                 temp_wp.set_action(  # set stay_for
                     index=action_index,
                     actiontype=ActionType.STAY_FOR,
-                    param=int(stay_for*1000)
+                    param=int(stay_for * 1000)
                 )
                 action_index += 1
             global_cmd_manager.apply_all_active_to_waypoint(
@@ -138,6 +159,17 @@ def convert(filename: str, set_agl=True):
             global_cmd = global_cmd_manager.is_global(command)
             if global_cmd:
                 param = float(row[global_cmd.param_loc])
+                if command is MPCommand.DO_CHANGE_SPEED:
+                    if param > 15.0:
+                        param = 15.0  # Litchi limits speed to 15 m/s max
+                        warnings.append(
+                            f"Line {file_list.index(row)}: {WarningMessage.SPEED_CAP.value}"
+                        )
+                    elif param < 0.0:
+                        param = 0  # no negative speed in Litchi, replace with cruise speed
+                        warnings.append(
+                            f"Line {file_list.index(row)}: {WarningMessage.SPEED_NEGATIVE.value}"
+                        )
                 global_cmd_manager.update(command, param)
                 if temp_wp:
                     global_cmd_manager.apply_to_waypoint(global_cmd, waypoint=temp_wp)
@@ -157,11 +189,12 @@ def convert(filename: str, set_agl=True):
             temp_wp = None
 
     output_string = Waypoint.get_header()
-    for wpoint in waypoint_list:
-        output_string += wpoint.to_line()
+    for waypoint in waypoint_list:
+        output_string += waypoint.to_line()
 
     with open(f"{filename}.csv", "w", encoding='utf-8') as output_file:
         output_file.write(output_string)
         output_file.close()
 
     print(f"\nFile saved: {filename}.csv")
+    return infos, warnings, errors
