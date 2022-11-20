@@ -46,6 +46,7 @@ class InfoMessage(Enum):
     """
     Enum class for info messages to be shows in the gui or log
     """
+    NO_SPEED_SET = 'No speed is set. Using Cruising Speed setting in litchi.'
 
 
 class WarningMessage(Enum):

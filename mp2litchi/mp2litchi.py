@@ -7,7 +7,7 @@ from typing import Tuple
 from litchi_wp.enums import AltitudeMode, ActionType
 from litchi_wp.waypoint import Waypoint
 
-from mp2litchi.enums import MPCommand, WarningMessage, ErrorMessage
+from mp2litchi.enums import MPCommand, WarningMessage, ErrorMessage, InfoMessage
 from mp2litchi.global_mp_cmd import GlobalMPCmdManager
 
 
@@ -114,6 +114,7 @@ def convert(filename: str, set_agl=True) -> Tuple[list[str], list[str], list[str
     infos: list[str] = []  # List of info messages
     warnings: list[str] = []  # List of warning messages
     errors: list[str] = []  # List of error messages
+    speed_not_set = True  # Indicator if Mission Planner DO_CHANGE_SPEED is set
     if not os.path.exists(filename):
         errors.append(ErrorMessage.FILE_NOT_FOUND.value)
 
@@ -160,6 +161,7 @@ def convert(filename: str, set_agl=True) -> Tuple[list[str], list[str], list[str
             if global_cmd:
                 param = float(row[global_cmd.param_loc])
                 if command is MPCommand.DO_CHANGE_SPEED:
+                    speed_not_set = False
                     if param > 15.0:
                         param = 15.0  # Litchi limits speed to 15 m/s max
                         warnings.append(
@@ -197,4 +199,6 @@ def convert(filename: str, set_agl=True) -> Tuple[list[str], list[str], list[str
         output_file.close()
 
     print(f"\nFile saved: {filename}.csv")
+    if speed_not_set:
+        infos.append(str(InfoMessage.NO_SPEED_SET.value))
     return infos, warnings, errors
