@@ -124,7 +124,7 @@ Go to the [Litchi Mission Hub](https://flylitchi.com/hub) and log in to your acc
 
 ### Set global settings
 
-Clink on `SETTINGS` in the bottom left corner. Make sure that the marked settings are set as shown in the image 
+Click on `SETTINGS` in the bottom left corner. Make sure that the marked settings are set as shown in the image 
 then click `Close`.
 
 <img src="https://github.com/YarostheLaunchpadder/MissionPlanner-to-Litchi/blob/main/docs/images/litchi_settings_menu.JPG?raw=true">
