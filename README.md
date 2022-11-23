@@ -35,5 +35,5 @@ There are two types of camera trigger methods supported.
 
 The two workflows are described in detail here:
 
-- [Distance trigger](https://github.com/YarostheLaunchpadder/MissionPlanner-to-Litchi/blob/main/docs/MP_cam_ctrl.md)
-- [Waypoint trigger](https://github.com/YarostheLaunchpadder/MissionPlanner-to-Litchi/blob/main/docs/MP_trigger_dist.md)
+- [Distance trigger](https://github.com/YarostheLaunchpadder/MissionPlanner-to-Litchi/blob/main/docs/MP_trigger_dist.md)
+- [Waypoint trigger](https://github.com/YarostheLaunchpadder/MissionPlanner-to-Litchi/blob/main/docs/MP_cam_ctrl.md)
