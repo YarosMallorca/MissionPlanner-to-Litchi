@@ -12,7 +12,7 @@ can be configured to have a delay. The delay stops the aircraft for the configur
 after that delay and continues with the flight-plan afterwards.
 The delay is meant to stabilize the aircraft and to capture the image without any blur due to movement. That way
 the flight speed can be much higher than in the 
-[trigger distance](https://github.com/YarostheLaunchpadder/MissionPlanner-to-Litchi/blob/main/docs/MP_trigger_dist) 
+[trigger distance](https://github.com/YarostheLaunchpadder/MissionPlanner-to-Litchi/blob/main/docs/MP_trigger_dist.md) 
 mode.
 
 ### Example
