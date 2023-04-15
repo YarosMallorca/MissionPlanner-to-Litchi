@@ -1,0 +1,82 @@
+name: Build and Release
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get version number
+        id: get_version
+        run: |
+          version=$(grep -oE -m 1 '[0-9]+\.[0-9]+\.[0-9]+' README.md)
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACTIONS }}
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}
+          release_name: v${{ steps.get_version.outputs.version }}
+          body: "Version ${{ steps.get_version.outputs.version }}"
+          draft: false
+          prerelease: false
+
+  build-and-upload:
+    needs: create-release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ['windows-latest', 'macos-latest', 'ubuntu-latest']
+        python-version: ['3.10']
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install PyInstaller
+        run: pip install pyinstaller
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build executables
+        run: |
+          pyinstaller --onefile run.py -n mp2litchi-${{ matrix.os }}
+
+      - name: Upload executables Windows
+        if: matrix.os == 'windows-latest'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACTIONS }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: dist\mp2litchi-${{ matrix.os }}.exe
+          asset_name: mp2litchi-${{ matrix.os }}.exe
+          asset_content_type: application/octet-stream
+
+      - name: Upload executables
+        if: matrix.os != 'windows-latest'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACTIONS }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: dist/mp2litchi-${{ matrix.os }}
+          asset_name: mp2litchi-${{ matrix.os }}
+          asset_content_type: application/octet-stream
