@@ -1,0 +1,10 @@
+<RCC>
+  <qresource prefix="icons">
+    <file>assets/icons/mp_to_litchi_icon.ico</file>
+    <file>assets/icons/bx-cog.png</file>
+    <file>assets/icons/bx-home-alt-2.png</file>
+    <file>assets/icons/bx-list-ul.png</file>
+    <file>assets/icons/bx-minus.png</file>
+    <file>assets/icons/bx-x.png</file>
+  </qresource>
+</RCC>
