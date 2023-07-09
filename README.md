@@ -1,4 +1,4 @@
-# Mission Planner to Litchi - Version 1.1.1
+# Mission Planner to Litchi - Version 1.1.2
 ## What is this application for?
 Mission Planner to Litchi is a tool to convert 
 [Mission Planner](https://ardupilot.org/planner/docs/mission-planner-installation.html) (ArduCopter) 
