@@ -125,10 +125,11 @@ def convert(filename: str, set_agl=True) -> Tuple[list[str], list[str], list[str
     temp_wp: Waypoint | None = None
 
     for row in file_list:
-        if file_list.index(row) == len(file_list) - 1:  # is last row
-            waypoint_list.append(temp_wp)  # store waypoint
-            temp_wp = None
         if not check_valid_line(row):  # skip invalid lines
+            if file_list.index(row) == len(file_list) - 1:  # is last row
+                waypoint_list.append(temp_wp)  # store waypoint
+                temp_wp = None
+                break  # was last line and invalid
             continue
         if row[1] == '1':  # skip home location
             continue
@@ -188,7 +189,9 @@ def convert(filename: str, set_agl=True) -> Tuple[list[str], list[str], list[str
                                     f"Line {file_list.index(row)}: "
                                     f"{ErrorMessage.NO_FREE_ACTION_SLOTS.value}"
                                 )
-
+        if file_list.index(row) == len(file_list) - 1:  # is last row
+            waypoint_list.append(temp_wp)  # store waypoint
+            temp_wp = None
     output_string = Waypoint.get_header()
     for waypoint in waypoint_list:
         output_string += waypoint.to_line()
