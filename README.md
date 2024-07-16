@@ -8,6 +8,11 @@ Mission Planner to Litchi was developed to be used to convert mapping survey mis
 [Mission Planner](https://ardupilot.org/planner/docs/mission-planner-installation.html) to 
 [Litchi](https://flylitchi.com/).
 
+## Looking to do 3D Mapping with your Waypoint-capable Mavic?
+### **Check out my new tool [DJI-Mapper](https://github.com/YarosMallorca/DJI-Mapper)**
+
+<hr>
+
 ### Survey missions in [Litchi](https://flylitchi.com/)
 
 Litchi doesn't support Survey mode yet, but here is a workaround!
